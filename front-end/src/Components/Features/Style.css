@@ -1,0 +1,16 @@
+.FeatureCardDiv{
+    text-align: center;
+}
+
+.CardDivInFeature{
+    border-radius: 5%;
+    box-shadow: 4px 4px 5px grey;
+    width: 28%;
+}
+
+.CardDivInFeature:hover{
+    box-shadow: 4px 4px 5px grey;
+    transform: scale(1.05);
+    background-color: #fed535;
+    transition: 0.5s;
+}

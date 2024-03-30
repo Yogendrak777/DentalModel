@@ -1,33 +1,5 @@
 # YOLOv5 🚀 by Ultralytics, GPL-3.0 license
-"""
-Run YOLOv5 detection inference on images, videos, directories, globs, YouTube, webcam, streams, etc.
-
-Usage - sources:
-    $ python detect.py --weights yolov5s.pt --source 0                               # webcam
-                                                     img.jpg                         # image
-                                                     vid.mp4                         # video
-                                                     screen                          # screenshot
-                                                     path/                           # directory
-                                                     list.txt                        # list of images
-                                                     list.streams                    # list of streams
-                                                     'path/*.jpg'                    # glob
-                                                     'https://youtu.be/Zgi9g1ksQHc'  # YouTube
-                                                     'rtsp://example.com/media.mp4'  # RTSP, RTMP, HTTP stream
-
-Usage - formats:
-    $ python detect.py --weights yolov5s.pt                 # PyTorch
-                                 yolov5s.torchscript        # TorchScript
-                                 yolov5s.onnx               # ONNX Runtime or OpenCV DNN with --dnn
-                                 yolov5s_openvino_model     # OpenVINO
-                                 yolov5s.engine             # TensorRT
-                                 yolov5s.mlmodel            # CoreML (macOS-only)
-                                 yolov5s_saved_model        # TensorFlow SavedModel
-                                 yolov5s.pb                 # TensorFlow GraphDef
-                                 yolov5s.tflite             # TensorFlow Lite
-                                 yolov5s_edgetpu.tflite     # TensorFlow Edge TPU
-                                 yolov5s_paddle_model       # PaddlePaddle
-"""
-
+import pyrebase
 import argparse
 import os
 import platform
@@ -35,6 +7,26 @@ import sys
 from pathlib import Path
 
 import torch
+
+
+config = {
+    "apiKey": "AIzaSyDAELQqdnplzZvFiTB9fuR1QcR4irT1Qdo",
+    "authDomain": "dentalproject-cf013.firebaseapp.com",
+    "projectId": "dentalproject-cf013",
+    "storageBucket": "dentalproject-cf013.appspot.com",
+    "messagingSenderId": "294932453729",
+    "appId": "1:294932453729:web:3d8babad0b06137b584d20",
+    "measurementId": "G-F0BQ8E9TPR",
+    "serviceAccount": "serviceAccount.json",
+    "databaseURL": "https://dentalproject-cf013-default-rtdb.firebaseio.com/"
+}
+
+firebase = pyrebase.initialize_app(config)
+
+storage = firebase.storage()
+
+
+
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -176,6 +168,8 @@ def run(
 
             # Stream results
             im0 = annotator.result()
+            cv2.imwrite('static/result.jpg', im0)
+            storage.child('result.jpg').put('static/result.jpg')
             if view_img:
                 if platform.system() == 'Linux' and p not in windows:
                     windows.append(p)
@@ -215,11 +209,10 @@ def run(
     if update:
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
 
-
-def parse_opt():
+def parse_opt(FILE):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'yolov5s.pt', help='model path or triton URL')
-    parser.add_argument('--source', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
+    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'best.pt', help='model path or triton URL')
+    parser.add_argument('--source', type=str, default=ROOT / FILE, help='file/dir/URL/glob/screen/0(webcam)')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
@@ -239,7 +232,7 @@ def parse_opt():
     parser.add_argument('--project', default=ROOT / 'runs/detect', help='save results to project/name')
     parser.add_argument('--name', default='exp', help='save results to project/name')
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
-    parser.add_argument('--line-thickness', default=3, type=int, help='bounding box thickness (pixels)')
+    parser.add_argument('--line-thickness', default=2, type=int, help='bounding box thickness (pixels)')
     parser.add_argument('--hide-labels', default=False, action='store_true', help='hide labels')
     parser.add_argument('--hide-conf', default=False, action='store_true', help='hide confidences')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
@@ -256,6 +249,12 @@ def main(opt):
     run(**vars(opt))
 
 
-if __name__ == '__main__':
-    opt = parse_opt()
+# if __name__ == '__main__':
+#     opt = parse_opt()
+#     main(opt)
+
+
+def Start(FILE):
+    opt = parse_opt(FILE)
     main(opt)
+ 
